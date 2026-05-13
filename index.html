@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum Maze Escape Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--cyan" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--violet" aria-hidden="true"></div>
+  <div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
+
+  <!-- START -->
+  <section id="screenStart" class="screen screen--active">
+    <div class="title-card">
+      <p class="eyebrow">Student project · Quantum computing theme</p>
+      <h1 class="title-main">Quantum Maze Escape</h1>
+      <p class="subtitle">Superposition · Measurement · Entanglement</p>
+    </div>
+    <div class="hero-orb" aria-hidden="true"></div>
+
+    <div class="enter-panel" role="group" aria-labelledby="enterPanelLabel">
+      <p id="enterPanelLabel" class="enter-panel__title">Before you enter</p>
+      <label class="player-field">
+        <span class="player-field__label">Your name</span>
+        <input
+          type="text"
+          class="player-field__input js-player-name"
+          id="inputPlayerName"
+          maxlength="28"
+          placeholder="Type your name"
+          autocomplete="nickname"
+        />
+      </label>
+      <p class="enter-panel__sub">Difficulty — 100 levels per mode (change anytime before starting). Clears are saved <strong>per name</strong> in this browser (separate for each mode and stage).</p>
+      <div class="mode-picker" role="radiogroup" aria-label="Choose difficulty">
+        <button type="button" class="mode-picker__btn mode-picker__btn--t1 mode-picker__btn--active" data-tier="1" role="radio" aria-checked="true">Easy</button>
+        <button type="button" class="mode-picker__btn mode-picker__btn--t2" data-tier="2" role="radio" aria-checked="false">Medium</button>
+        <button type="button" class="mode-picker__btn mode-picker__btn--t3" data-tier="3" role="radio" aria-checked="false">Hard</button>
+        <button type="button" class="mode-picker__btn mode-picker__btn--t4" data-tier="4" role="radio" aria-checked="false">Expert</button>
+        <button type="button" class="mode-picker__btn mode-picker__btn--t5" data-tier="5" role="radio" aria-checked="false">Master</button>
+        <button type="button" class="mode-picker__btn mode-picker__btn--t6" data-tier="6" role="radio" aria-checked="false">Extreme</button>
+      </div>
+    </div>
+
+    <div class="start-actions">
+      <button type="button" class="btn btn--primary" id="btnPlay">Enter the maze</button>
+      <button type="button" class="btn btn--ghost" id="btnHowToPlay">How to play</button>
+      <button type="button" class="btn btn--ghost" id="btnViewRules">View rules</button>
+    </div>
+
+    <!-- Short project explanation for presentations (visible on title screen) -->
+    <details class="project-about" id="projectAboutStart">
+      <summary>About this project</summary>
+      <div class="project-about__body">
+        <p><strong>Goal:</strong> Escape a maze using ideas inspired by quantum physics — not a quantum computer simulation, but a <em>teaching metaphor</em> that is easy to explain in a viva. Pick a <strong>difficulty mode</strong> (Easy through Extreme): each mode has <strong>100 procedural stages</strong>. The same mode + stage number always yields the same maze (seed in <code>getLevelDefinition</code>).</p>
+        <p><strong>What you do:</strong> Move on a grid, use <strong>Split</strong> to exist in several possible cells at once, <strong>Measure</strong> to collapse to one cell, and use <strong>entangled portals</strong> (matching colours) to jump across the maze.</p>
+        <p><strong>Tech:</strong> Single-page app with HTML, CSS, and JavaScript only; runs fully in the browser with no backend.</p>
+      </div>
+    </details>
+
+    <footer class="screen-footer">HTML · CSS · JavaScript · No server required</footer>
+  </section>
+
+  <!-- INSTRUCTIONS -->
+  <section id="screenInstructions" class="screen">
+    <div class="panel panel--instructions">
+      <h2>Mission brief</h2>
+      <p>Reach the <span class="pill pill--exit">EXIT</span> using quantum-inspired rules.</p>
+      <ul class="inst-list">
+        <li><strong>Move:</strong> Arrow keys or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></li>
+        <li><strong>Split:</strong> Create 2–3 “ghost” positions on adjacent paths (superposition).</li>
+        <li><strong>Measure:</strong> Randomly keep one position; the rest disappear (collapse).</li>
+        <li><strong>Portals:</strong> Matching symbols — step on one to teleport to its partner (entanglement).</li>
+        <li><strong>Energy:</strong> Optional extra score from orbs on the floor.</li>
+      </ul>
+      <p class="inst-hint">You win if <em>any</em> of your positions touches the exit — even a ghost.</p>
+
+      <div class="enter-panel enter-panel--compact" role="group" aria-labelledby="enterPanelLabelInst">
+        <p id="enterPanelLabelInst" class="enter-panel__title enter-panel__title--sm">Name &amp; difficulty</p>
+        <label class="player-field player-field--inline">
+          <span class="player-field__label">Your name</span>
+          <input
+            type="text"
+            class="player-field__input js-player-name"
+            id="inputPlayerNameInst"
+            maxlength="28"
+            placeholder="Same as title screen"
+            autocomplete="nickname"
+          />
+        </label>
+        <p class="enter-panel__sub enter-panel__sub--sm">Difficulty — tap a mode, then Start game</p>
+        <div class="mode-picker" role="radiogroup" aria-label="Choose difficulty">
+          <button type="button" class="mode-picker__btn mode-picker__btn--t1 mode-picker__btn--active" data-tier="1" role="radio" aria-checked="true">Easy</button>
+          <button type="button" class="mode-picker__btn mode-picker__btn--t2" data-tier="2" role="radio" aria-checked="false">Medium</button>
+          <button type="button" class="mode-picker__btn mode-picker__btn--t3" data-tier="3" role="radio" aria-checked="false">Hard</button>
+          <button type="button" class="mode-picker__btn mode-picker__btn--t4" data-tier="4" role="radio" aria-checked="false">Expert</button>
+          <button type="button" class="mode-picker__btn mode-picker__btn--t5" data-tier="5" role="radio" aria-checked="false">Master</button>
+          <button type="button" class="mode-picker__btn mode-picker__btn--t6" data-tier="6" role="radio" aria-checked="false">Extreme</button>
+        </div>
+      </div>
+
+      <details class="project-about project-about--inline">
+        <summary>About this project (for your presentation)</summary>
+        <div class="project-about__body">
+          <p>This game is a <strong>metaphor</strong>: superposition = many possible locations; measurement = picking one outcome; portals = linked locations like entangled pairs. The code keeps each idea in a small, separate function so you can point to it during a viva.</p>
+        </div>
+      </details>
+
+      <div class="inst-actions">
+        <button type="button" class="btn btn--primary" id="btnStartGame">Start game</button>
+        <button type="button" class="btn btn--ghost" id="btnViewRulesInst">View rules</button>
+        <button type="button" class="btn btn--ghost" id="btnBackTitle">Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="screenGame" class="screen">
+    <header class="game-header glass-bar">
+      <div class="game-header__left">
+        <span class="game-brand" aria-hidden="true">◇</span>
+        <div class="game-header__titles">
+          <h2 class="game-title">Quantum Maze</h2>
+          <p class="game-player" id="gamePlayerDisplay">Explorer</p>
+        </div>
+      </div>
+      <div class="game-header__actions">
+        <button type="button" class="btn btn--ghost btn--header" id="btnRulesHeader" title="Open the full rulebook (objectives, quantum actions, scoring).">
+          Game rules
+        </button>
+        <div class="header-toggles">
+          <label class="toggle" title="Short beeps for moves, split, measure, portals, and wins.">
+            <input type="checkbox" id="chkSound" checked />
+            <span>Sound</span>
+          </label>
+          <label class="toggle" title="Soft ambient tone during play (stops when paused or on the title screen).">
+            <input type="checkbox" id="chkMusic" />
+            <span>Music</span>
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <div class="game-layout">
+      <aside class="side-panel glass-panel">
+        <div class="stat-grid">
+          <div class="stat-card" title="Current stage within the active difficulty mode (1–100). Changing mode restarts at stage 1 for that mode."><span class="stat-label">Stage</span> <span id="statLevel" class="stat-value">1</span></div>
+          <div class="stat-card stat-card--difficulty"><span class="stat-label">Mode</span> <span id="statDifficulty" class="diff-badge diff-badge--t1" title="Selected difficulty — 100 levels in this mode">Easy</span></div>
+          <div class="stat-card" title="Steps taken this stage (all tokens move together on each step)."><span class="stat-label">Moves</span> <span id="statMoves" class="stat-value">0</span></div>
+          <div class="stat-card" title="Run total: energy orbs, level clears, and fewer-move bonus."><span class="stat-label">Score</span> <span id="statScore" class="stat-value">0</span></div>
+          <div class="stat-card stat-card--wide" title="Classical = one position. Superposition = multiple ghost positions until you measure."><span class="stat-label">State</span> <span id="statMode" class="stat-value stat-value--sm">Classical</span></div>
+        </div>
+
+        <p class="run-banner" id="runBanner" aria-live="polite" title="Current difficulty mode and stage in your active run.">
+          Easy · Stage 1/100 · active run
+        </p>
+
+        <div class="level-progress" id="levelProgressPanel" title="Completion is stored in this browser for your name. Each mode has its own 100 stages; clearing stage 5 in Easy does not mark stage 5 in Hard.">
+          <p class="level-progress__label">Your progress — <span id="levelProgressModeLabel">Easy</span></p>
+          <p class="level-progress__summary" id="levelProgressSummary">0 / 100 stages cleared</p>
+          <div
+            class="level-progress__meter"
+            id="levelProgressMeter"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuenow="0"
+            aria-valuemax="100"
+            aria-label="Stages cleared in this difficulty mode"
+          >
+            <div class="level-progress__track">
+              <div class="level-progress__fill" id="levelProgressFill"></div>
+            </div>
+            <span class="level-progress__pct" id="levelProgressPct">0%</span>
+          </div>
+          <div class="level-progress__grid" id="levelProgressGrid" role="list" aria-label="Stages cleared for current player and difficulty"></div>
+        </div>
+
+        <div class="game-difficulty" id="gameDifficultyPanel" title="Switch difficulty: starts stage 1 in that mode (new run). Saved clears below are per mode. Locked until you leave the win screen.">
+          <p class="game-difficulty__label">Change difficulty</p>
+          <p class="game-difficulty__hint">Starts a <strong>new run</strong> in that mode at <strong>stage 1/100</strong> (score resets). Your <em>saved</em> checkmarks stay per mode in the grid.</p>
+          <div class="mode-picker mode-picker--sidebar" role="radiogroup" aria-label="Change difficulty during game">
+            <button type="button" class="mode-picker__btn mode-picker__btn--t1 mode-picker__btn--active" data-tier="1" role="radio" aria-checked="true">Easy</button>
+            <button type="button" class="mode-picker__btn mode-picker__btn--t2" data-tier="2" role="radio" aria-checked="false">Medium</button>
+            <button type="button" class="mode-picker__btn mode-picker__btn--t3" data-tier="3" role="radio" aria-checked="false">Hard</button>
+            <button type="button" class="mode-picker__btn mode-picker__btn--t4" data-tier="4" role="radio" aria-checked="false">Expert</button>
+            <button type="button" class="mode-picker__btn mode-picker__btn--t5" data-tier="5" role="radio" aria-checked="false">Master</button>
+            <button type="button" class="mode-picker__btn mode-picker__btn--t6" data-tier="6" role="radio" aria-checked="false">Extreme</button>
+          </div>
+        </div>
+
+        <div class="resource-bar">
+          <span class="resource-bar__item" title="Splits remaining for superposition (create ghosts on adjacent cells).">Splits <strong id="statSplits">0</strong></span>
+          <span class="resource-bar__item" title="Measures remaining to collapse multiple positions down to one random survivor.">Measures <strong id="statMeasures">0</strong></span>
+        </div>
+        <p class="quantum-hint" id="quantumHint" title="Stage tip from the level generator: size, portals, and strategy hints for this mode.">Tip loads when you start a level.</p>
+
+        <div class="button-stack">
+          <button
+            type="button"
+            class="btn btn--accent btn--has-tip"
+            id="btnSplit"
+            title="Split (superposition): uses one charge. Spreads into 2–3 ghost positions on neighbouring path cells, then resolves portals."
+            data-tip="Split: uses 1 charge. Creates 2–3 ghosts on adjacent paths; portals may trigger next."
+          >
+            Split — superposition
+          </button>
+          <button
+            type="button"
+            class="btn btn--measure btn--has-tip"
+            id="btnMeasure"
+            disabled
+            title="Measure (collapse): only when you have several positions. Picks one at random and removes the rest; uses one measure charge."
+            data-tip="Measure: needs multiple positions. Randomly keeps one reality; costs 1 measure."
+          >
+            Measure — collapse
+          </button>
+          <div class="button-row">
+            <button
+              type="button"
+              class="btn btn--ghost btn--sm btn--has-tip"
+              id="btnPause"
+              title="Pause: freezes the maze. Press Esc or Resume to continue. Music stops while paused."
+              data-tip="Pause — Esc or Resume. Music pauses with you."
+            >
+              Pause
+            </button>
+            <button
+              type="button"
+              class="btn btn--ghost btn--sm btn--has-tip"
+              id="btnRestart"
+              title="Restart: reloads this stage from the start with the same difficulty and score (except on level 1 reset rules)."
+              data-tip="Restart: same stage and mode. Resets moves, splits, and energy pickups on this map."
+            >
+              Restart
+            </button>
+          </div>
+          <button
+            type="button"
+            class="btn btn--secondary btn--has-tip"
+            id="btnNextLevel"
+            disabled
+            title="Next level: unlocks after you clear the maze. Continues your run on the following stage."
+            data-tip="Next level — available after you reach the exit (★)."
+          >
+            Next level
+          </button>
+        </div>
+
+        <details class="project-about project-about--game">
+          <summary>About this project</summary>
+          <div class="project-about__body">
+            <p><strong>Idea:</strong> Teach superposition, measurement, and entanglement through playable rules.</p>
+            <p><strong>In code:</strong> <code>MODE_CURVE</code> and <code>getLevelDefinition(stage, mode)</code> build each of the six modes (100 stages each); quantum rules live in <code>createSuperposition</code>, <code>collapseMeasurement</code>, <code>applyPortals</code>.</p>
+          </div>
+        </details>
+
+        <div class="edu-panel">
+          <h3>Viva cheat-sheet</h3>
+          <dl>
+            <dt>Superposition</dt>
+            <dd>Many possible states at once until something forces one outcome.</dd>
+            <dt>Measurement</dt>
+            <dd>One outcome is selected; the other possibilities are discarded.</dd>
+            <dt>Entanglement</dt>
+            <dd>Two places are linked: entering one portal sends you to its partner.</dd>
+          </dl>
+        </div>
+      </aside>
+
+      <div class="board-wrap glass-panel board-panel">
+        <div class="legend-bar" aria-hidden="true">
+          <span class="legend-item" title="Start — your spawn tile at the beginning of each level. Hover maze tiles for more hints."><i class="dot dot--start"></i> Start</span>
+          <span class="legend-item" title="Exit (★) — reach this with any of your states (or ghosts) to win the level."><i class="dot dot--exit"></i> Exit</span>
+          <span class="legend-item" title="Portals — matching Greek letters are pairs. Step on one symbol to teleport to the other (entanglement metaphor)."><i class="dot dot--portal-a"></i><i class="dot dot--portal-b"></i> Portals</span>
+          <span class="legend-item" title="Energy — optional orbs on the path. Collect by stepping on them for +50 score each."><i class="dot dot--energy"></i> Energy</span>
+        </div>
+        <div id="statusBar" class="status-bar" role="status" aria-live="polite">Ready.</div>
+        <div id="mazeBoard" class="maze-board"></div>
+        <div id="collapseOverlay" class="collapse-overlay" aria-hidden="true"></div>
+        <div id="fxBeam" class="fx-beam" aria-hidden="true"></div>
+
+        <div id="winOverlay" class="win-overlay" aria-hidden="true">
+          <div class="win-fx win-fx--inline" id="winFx" aria-hidden="true"></div>
+            <div class="panel panel--win" id="winPanel">
+            <p class="win-badge">Level clear · <span id="winDifficulty">Easy</span></p>
+            <h2 class="win-title">Escaped</h2>
+            <p class="win-sub">At least one of your states reached the exit.</p>
+            <div class="win-stats">
+              <p>Score <strong id="winScore">0</strong></p>
+              <p>Moves this level <strong id="winMoves">0</strong></p>
+            </div>
+            <div class="win-actions">
+              <button type="button" class="btn btn--primary" id="btnWinNext" title="Continue to the next stage in this difficulty.">Next level</button>
+              <button type="button" class="btn btn--secondary" id="btnWinRestart" title="Restart the campaign at stage 1 in this mode (score resets on stage 1).">Play from level 1</button>
+              <button type="button" class="btn btn--ghost" id="btnWinTitle" title="Return to the title screen.">Title screen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Full rulebook (any screen — presentation-friendly sections) -->
+  <div id="rulesModal" class="modal modal--rules" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rulesModalTitle">
+    <div class="modal__panel modal__panel--rules">
+      <header class="rules-modal__header">
+        <div class="rules-modal__title-wrap">
+          <span class="rules-modal__badge" aria-hidden="true">◇</span>
+          <h2 id="rulesModalTitle" class="rules-modal__title">Game Rules</h2>
+        </div>
+        <button type="button" class="rules-modal__close btn btn--ghost btn--sm" id="btnCloseRules" aria-label="Close rules">Close</button>
+      </header>
+      <div class="rules-modal__body">
+        <section class="rules-section rules-section--objective">
+          <h3 class="rules-section__heading"><span class="rules-section__icon" aria-hidden="true">◎</span> Objective</h3>
+          <p class="rules-section__text">
+            Reach the <strong class="rules-hl rules-hl--cyan">exit (★)</strong> on the grid. You complete the stage when
+            <em>any one</em> of your active positions touches the exit — including translucent “ghost” copies from superposition.
+          </p>
+        </section>
+        <section class="rules-section rules-section--super">
+          <h3 class="rules-section__heading"><span class="rules-section__icon" aria-hidden="true">⧫</span> Superposition</h3>
+          <p class="rules-section__text">
+            Press <strong class="rules-hl rules-hl--violet">Split</strong> to spread into <strong>2–3</strong> possible locations on
+            <strong>adjacent walkable tiles</strong>. Each use consumes one split from your budget. Superposition helps you probe forks
+            and cover distance — at the cost of harder control until you measure.
+          </p>
+        </section>
+        <section class="rules-section rules-section--measure">
+          <h3 class="rules-section__heading"><span class="rules-section__icon" aria-hidden="true">◉</span> Measurement</h3>
+          <p class="rules-section__text">
+            When several positions exist, <strong class="rules-hl rules-hl--mag">Measure</strong> randomly selects
+            <strong>one</strong> surviving cell and removes the others (wavefunction collapse). Measurement uses a limited charge pool.
+            Portals may still apply immediately after collapse.
+          </p>
+        </section>
+        <section class="rules-section rules-section--entangle">
+          <h3 class="rules-section__heading"><span class="rules-section__icon" aria-hidden="true">⇄</span> Entanglement</h3>
+          <p class="rules-section__text">
+            <strong class="rules-hl rules-hl--cyan">Portals</strong> appear as paired tiles with the <strong>same Greek symbol</strong>.
+            Stepping onto one sends you to its partner elsewhere in the maze — a simple metaphor for linked (entangled) locations.
+            Chained jumps resolve automatically.
+          </p>
+        </section>
+        <section class="rules-section rules-section--move">
+          <h3 class="rules-section__heading"><span class="rules-section__icon" aria-hidden="true">✥</span> Movement rules</h3>
+          <p class="rules-section__text">
+            Use <kbd class="rules-kbd">Arrow keys</kbd> or <kbd class="rules-kbd">W</kbd><kbd class="rules-kbd">A</kbd><kbd class="rules-kbd">S</kbd><kbd class="rules-kbd">D</kbd>.
+            One keypress moves <strong>every</strong> active token one step in that direction; hitting a wall stops that token only.
+            On touch devices, drag on the maze to steer. <strong>Walls</strong> are solid. <strong>Pause</strong> freezes action;
+            <strong>Restart</strong> reloads the current stage number with a fresh attempt.
+          </p>
+        </section>
+        <section class="rules-section rules-section--score">
+          <h3 class="rules-section__heading"><span class="rules-section__icon" aria-hidden="true">⌖</span> Scoring</h3>
+          <p class="rules-section__text">
+            Collect optional <strong class="rules-hl rules-hl--mag">energy orbs</strong> for <strong>+50</strong> each. Clearing a level awards a
+            <strong>completion bonus</strong> that favours fewer moves. Your score is designed to carry across stages in the same run so
+            progression feels rewarding (difficulty and stage layout come from the selected mode).
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="pauseModal" class="modal" aria-hidden="true">
+    <div class="modal__panel">
+      <h2>Paused</h2>
+      <p>Press <kbd>Esc</kbd> or tap Resume.</p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--primary" id="btnResume">Resume</button>
+        <button type="button" class="btn btn--ghost" id="btnRulesFromPause">View rules</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
